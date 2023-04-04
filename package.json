@@ -1,64 +1,170 @@
 {
-	"name": "vscode-tosca",
-	"displayName": "TOSCA",
-	"description": "TOSCA language support for VSCode",
-	"author": "Tal Liron",
+	"name": "gop-lsp-vscode",
+	"displayName": "GoPlus",
+	"description": "GoPlus language support for VSCode",
+	"author": "goplus",
 	"license": "Apache 2.0",
-	"version": "1.0.0",
+	"version": "0.1.3",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/tliron/puccini-vscode"
+		"url": "https://github.com/goplus/vscode-goplus"
 	},
 	"bugs": {
-		"url": "https://github.com/tliron/puccini-vscode/issues"
+		"url": "https://github.com/goplus/vscode-goplus/issues"
 	},
-	"publisher": "Puccini",
 	"categories": [
 		"Programming Languages",
 		"Formatters"
 	],
 	"keywords": [
-		"tosca",
-		"oasis",
-		"puccini",
-		"yaml"
+		"goplus",
+		"language server",
+		"lsp"
 	],
 	"engines": {
 		"vscode": "^1.52.0"
 	},
 	"main": "out/extension",
+	"publisher": "goplus",
 	"activationEvents": [
-		"*"
-	],
+        "onLanguage"
+    ],
 	"contributes": {
 		"languages": [
 			{
-				"id": "tosca",
+				"id": "gop",
 				"aliases": [
-					"TOSCA"
+					"goplus",
+					"gop"
 				],
-				"configuration": "assets/language-configuration.json"
+				"extensions": [
+					".gop"
+				],
+				"configuration": "./language-configuration.json"
+			},
+			{
+				"id": "spx",
+				"aliases": [
+					"goplus",
+					"gop",
+					"spx"
+				],
+				"extensions": [
+					".gmx",
+					".spx"
+				],
+				"configuration": "./language-configuration.json"
 			}
 		],
 		"grammars": [
 			{
-				"language": "tosca",
-				"scopeName": "source.yaml",
-				"path": "assets/yaml.tmLanguage.json"
+				"language": "gop",
+				"scopeName": "source.gop",
+				"path": "./syntaxes/gop.tmLanguage.json"
+			},
+			{
+				"language": "spx",
+				"scopeName": "source.spx",
+				"path": "./syntaxes/spx.tmLanguage.json"
 			}
 		],
-		"configuration": {
-			"type": "object",
-			"title": "Configuration",
-			"properties": {
-				"tosca.debug.verbosity": {
-					"scope": "window",
-					"type": "number",
-					"default": 1,
-					"description": "Log verbosity."
+		"snippets": [
+			{
+				"language": "gop",
+				"path": "./snippets/goplus.json"
+			},
+			{
+				"language": "spx",
+				"path": "./snippets/spx.json"
+			}
+		],
+		"configurationDefaults": {
+			"[gop]": {
+				"editor.insertSpaces": false,
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+					"source.organizeImports": true
+				}
+			},
+			"[spx]": {
+				"editor.insertSpaces": false,
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+					"source.organizeImports": true
 				}
 			}
-		}
+		},
+		"configuration": {
+			"type": "object",
+			"title": "GoPlus",
+			"properties": {
+				"goplus.formatTool": {
+					"type": "string",
+					"default": "gopfmt",
+					"description": "Pick 'gopfmt' to run on format.",
+					"scope": "resource",
+					"enum": [
+						"gopfmt"
+					]
+				},
+				"goplus.formatFlags": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [],
+					"description": "Flags to pass to format tool (e.g. [\"-w\"])",
+					"scope": "resource"
+				},
+				"goplus.toolsEnvVars": {
+					"type": "object",
+					"default": {},
+					"description": "Environment variables that will passed to the processes that run the Go tools (e.g. CGO_CFLAGS)",
+					"scope": "resource"
+				},
+				"goplus.alternateTools": {
+					"type": "object",
+					"default": {},
+					"description": "Alternate tools or alternate paths for the same tools used by the Go extension. Provide either absolute path or the name of the binary in GOPATH/bin, GOROOT/bin or PATH. Useful when you want to use wrapper script for the Go tools or versioned tools from https://gopkg.in.",
+					"scope": "resource",
+					"properties": {
+						"gopfmt": {
+							"type": "string",
+							"default": "gopfmt",
+							"description": "Alternate tool to use instead of the gopfmt binary or alternate path to use for the gopfmt binary."
+						}
+					}
+				},
+				"goplus.docsTool": {
+					"type": "string",
+					"default": "godoc",
+					"description": "Pick 'godoc' or 'gogetdoc' to get documentation. Not applicable when using the language server.",
+					"scope": "resource",
+					"enum": [
+						"godoc"
+					]
+				},
+				"goplus.gocodeFlags": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [
+						"-builtin",
+						"-ignore-case"
+					],
+					"description": "Additional flags to pass to gocode. Not applicable when using the language server.",
+					"scope": "resource"
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "goplus.import.add",
+				"title": "GoPlus: Add Import",
+				"description": "Add an import declaration"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

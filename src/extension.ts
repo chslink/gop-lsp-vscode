@@ -7,8 +7,6 @@ import { workspace, languages, ExtensionContext, TextDocument, } from 'vscode';
 import { ClientCapabilities, DocumentSelector, InitializeParams, LanguageClient, LanguageClientOptions, ServerCapabilities, ServerOptions, StaticFeature } from 'vscode-languageclient/node';
 
 export function activate(context: ExtensionContext) {
-	//console.log('TOSCA');
-
 	createClient();
 
 	checkAllDocuments();
@@ -23,17 +21,12 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(disposable);
 }
 
-export function deactivate(): Thenable<void> | undefined {
-	if (client) {
-		return client.stop();
-	} else {
-		return undefined;
-	}
+export function deactivate() {
+	return Promise.all([
+		client?.stop(),
+	])
 }
 
-//
-// Detect TOSCA documents
-//
 
 function checkAllDocuments() {
 	for (const textDocument of workspace.textDocuments) {
@@ -43,37 +36,35 @@ function checkAllDocuments() {
 
 function checkDocument(textDocument: TextDocument) {
 	// Any YAML file that contains a line starting with "tosca_definitions_version: "
-	if (textDocument.fileName.match(/.yaml$/) && textDocument.getText().match(/^tosca_definitions_version: /m)) {
-		languages.setTextDocumentLanguage(textDocument, 'tosca');
+	if (textDocument.fileName.match(/.gop$/)) {
+		languages.setTextDocumentLanguage(textDocument, 'gop');
 	}
 }
 
-//
-// Client for TOSCA Language Server
-//
 
 let client: LanguageClient;
 
 function createClient() {
-	let command = '/home/emblemparade/go/bin/puccini-language-server'
+	let command = '/data/work/gop-lsp/gop-lsp'
 
 	let serverOptions: ServerOptions = {
 		run: {
-			command: command
+			command: command,
+			args: ['-mode=1', '-logflag=1']
 		},
 		debug: {
 			command: command,
-			args: ['-v']
+			args: ['-mode=1', '-logflag=1']
 		}
 	};
 
 	let clientOptions: LanguageClientOptions = {
-		documentSelector: [{ scheme: 'file', language: 'tosca' }]
+		documentSelector: [{ scheme: 'file', language: 'gop' }]
 	};
 
 	client = new LanguageClient(
-		'tosca',
-		'TOSCA Language Server', // this is also the name of the output (log) and trace channels
+		'gop',
+		'GoPlus Language Server',
 		serverOptions,
 		clientOptions
 	);
@@ -102,9 +93,9 @@ class TraceFeature implements StaticFeature {
 		params.trace = this._trace;
 	}
 
-	fillClientCapabilities(_capabilities: ClientCapabilities): void {}
-	initialize(_capabilities: ServerCapabilities<any>, _documentSelector: DocumentSelector): void {}
-	dispose(): void {}
+	fillClientCapabilities(_capabilities: ClientCapabilities): void { }
+	initialize(_capabilities: ServerCapabilities<any>, _documentSelector: DocumentSelector): void { }
+	dispose(): void { }
 }
 
 // See: https://github.com/microsoft/vscode-languageserver-node/blob/f2902aacfa2fce6f5cb9448d6dffeef2ace3e570/client/src/node/main.ts#L240
