@@ -3,10 +3,9 @@
 GoPlus Visual Studio Code Extension
 ==========================================
 
-Adds [GoPlus](github.com/goplus/gop) language support to [Visual Studio Code](https://code.visualstudio.com/).
+Adds [GoPlus](https://github.com/goplus/gop) language support to [Visual Studio Code](https://code.visualstudio.com/).
 
 Supported features:
-
 
 
 TODO:
